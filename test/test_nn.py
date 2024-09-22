@@ -3390,6 +3390,28 @@ class TestCompositeDist:
         assert sample.shape == torch.Size((4,) + params.shape)
         assert sample.requires_grad
 
+    def test_probs(self):
+        params = TensorDict(
+            {
+                "cont": {"loc": torch.randn(3, 4), "scale": torch.rand(3, 4)},
+                ("nested", "disc"): {"logits": torch.randn(3, 10)},
+            },
+            [3],
+        )
+        dist = CompositeDistribution(
+            params,
+            distribution_map={
+                "cont": distributions.Normal,
+                ("nested", "disc"): distributions.Categorical,
+            },
+        )
+        probs = dist.probs()
+        import ipdb; ipdb.set_trace()
+        assert dist.batch_shape == params.shape
+        assert len(dist.dists) == 2
+        assert "cont" in dist.dists
+        assert ("nested", "disc") in dist.dists
+
     def test_log_prob(self):
         params = TensorDict(
             {

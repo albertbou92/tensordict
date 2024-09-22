@@ -134,6 +134,18 @@ class CompositeDistribution(d.Distribution):
             aggregate_probabilities = self._aggregate_probabilities = False
         return aggregate_probabilities
 
+    @property
+    def probs(self):
+        """Returns the probabilities of the distributions, if available."""
+        p = {}
+        for name, dist in self.dists.items():
+            if hasattr(dist, "probs"):
+                p[name] = dist.probs
+        TensorDict(
+            p,
+            self.batch_shape,
+        )
+
     @aggregate_probabilities.setter
     def aggregate_probabilities(self, value):
         self._aggregate_probabilities = value
